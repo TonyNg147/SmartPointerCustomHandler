@@ -15,11 +15,17 @@ public:
         {
             throw std::runtime_error("Implementation for this class cannot be created on Stack!");
         }
+        m_count = 0;
     }
 
     void ref() override
     {
         ++m_count;
+    }
+
+    virtual uint32_t refCount() override
+    {
+        return m_count.load();
     }
 
     void unref() override

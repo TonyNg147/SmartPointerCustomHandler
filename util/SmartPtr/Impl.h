@@ -14,7 +14,7 @@ class ImplementationSupport: public I...
 
         void* support_query(const InterfaceID& id)
         {
-
+            std::cout << __LINE__ << " Call herer\n";
             static std::once_flag flag;
             std::call_once(flag, [&]()
             {
@@ -25,8 +25,11 @@ class ImplementationSupport: public I...
             auto it = m_castMaps.find(id);
             if (it != m_castMaps.end())
             {
+                std::cout << __LINE__ << " Call herer\n";
+                qWarning() << "Find";
                 return it->second(reinterpret_cast<Impl*>(this));
             }
+            std::cout << __LINE__ << " Call herer\n";
             return nullptr;
         }
 

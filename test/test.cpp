@@ -1,16 +1,40 @@
 #include <iostream>
 #include <PtrHelpers.h>
+
+class DemoController: public Interface
+{
+public:
+    DemoController()
+    {
+        // std::cout << "Construct Controller\n";
+    }
+    ~DemoController()
+    {
+        // std::cout << "Destruct Controller\n";
+    }
+    virtual void* cast(InterfaceID id) override
+    {
+        if (id == iid<DemoController>)
+        {
+            return static_cast<void*>(this);
+        }
+        std::cout <<__LINE__ << " Call casting herere\n";
+        return nullptr;
+    }
+};
+
+
 class DemoObject: 
-    public AppendCountableHelper<DemoObject, Interface>
+    public AppendCountableHelper<DemoObject, DemoController>
 {
     public:
         DemoObject()
         {
-            std::cout << "Create demo object " << this << "\n";
+            // std::cout << "Create demo object " << this << "\n";
         }
         virtual ~DemoObject()
         {
-            std::cout << "Call destruct\n";
+            // std::cout << "Call destruct\n";
         }
 
         virtual void* cast(InterfaceID id) override
@@ -24,22 +48,15 @@ class DemoObject:
 };
 
 REGISTER_SYS_INTERFACE(DemoObject);
+REGISTER_SYS_INTERFACE(DemoController);
 
 int main(int argc, char** argv)
 {
     {
-        SharedPtr<DemoObject> refPtr1;
-        {
-            DemoObject *object = new DemoObject();
-            SharedPtr<DemoObject> refPtr2(object);
-            refPtr1 = refPtr2;
-        }
-        std::cout << "Get out the first scope\n";
+        SharedPtr<DemoObject> refPtr1 = makeRef<DemoObject>();
+        refPtr1->cast(iid<DemoController>);
+        DemoController* controller = refPtr1.get<DemoController>();
+        std::cout << "The address is " <<controller << "\n";
     }
-    std::cout << "Get out the second scope\n";
-
-    // {
-    //     auto sharedPtr = makeRef<DemoObject>();
-    // }
 
 }

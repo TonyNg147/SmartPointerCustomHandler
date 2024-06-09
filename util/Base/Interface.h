@@ -1,5 +1,7 @@
 #pragma once
 #include <type_traits>
+#include <string.h>
+#include <iostream>
 class InterfaceID
 {
     public:
@@ -22,11 +24,11 @@ class InterfaceID
 
         bool operator==(const InterfaceID& o) const
         {
-            return *m_id == *o.m_id;
+            return std::string(m_id) == std::string(o.m_id);
         }
         bool operator<(const InterfaceID& o) const
         {
-            return *m_id < *o.m_id;
+            return std::string(m_id) < std::string(o.m_id);
         }
 
     private:
@@ -40,6 +42,8 @@ class Interface
         virtual void ref(){};
 
         virtual void unref(){};
+
+        virtual uint32_t refCount(){return 0;};
 
         virtual void* cast(InterfaceID) = 0;
 };
@@ -80,11 +84,11 @@ struct InterfaceDefinedID<N>: std::true_type{};
 
 
 
-template<typename FROM, typename TO>
-FROM* qi(TO* to)
+template<typename TO, typename FROM>
+TO* qi(FROM* to)
 {
     static_assert(std::is_base_of_v<Interface, FROM> && std::is_base_of_v<Interface, TO>);
-    return to->cast(iid<FROM>);
+    return reinterpret_cast<TO*>(to->cast(iid<TO>));
 };
 
 REGISTER_SYS_INTERFACE(Interface);

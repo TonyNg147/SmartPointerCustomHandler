@@ -1,6 +1,9 @@
 #pragma once
 #include <type_traits>
 #include <iostream>
+template<typename F, typename T>
+concept IsTypeCompatible = std::is_same_v<F,T> || std::derived_from<T,F>;
+
 /**
     The Normal shared pointer attaches the handler for counting and managing 
     lifecycle of the instance inside the class. This can be rigid and hard for the customization
@@ -32,10 +35,10 @@ class SharedPtr
             }
         }
 
-        template<typename O> requires IsTypeCompatible<O,T>
-        SharedPtr(const SharedPtr<O>& o)
+        template<typename Derived,typename Parent = T> requires IsTypeCompatible<Parent,Derived>
+        SharedPtr(const SharedPtr<Derived>& o)
         {
-            m_obj = o.m_obj;
+            m_obj = o.get();
             if (m_obj)
             {
                 m_obj->ref();
@@ -63,6 +66,20 @@ class SharedPtr
         T* get() const
         {
             return reinterpret_cast<T*>(m_obj);
+        }
+
+        T* operator->() const
+        {
+            return m_obj;
+        }
+
+        void reset()
+        {
+            if (m_obj)
+            {
+                m_obj->unref();
+            }
+            m_obj = nullptr;
         }
 
         /**
