@@ -2,6 +2,7 @@
 #include <type_traits>
 #include <string.h>
 #include <iostream>
+#include <TypeHelpers.h>
 class InterfaceID
 {
     public:
@@ -48,8 +49,8 @@ class Interface
         virtual void* cast(InterfaceID) = 0;
 };
 
-template<typename>                  
-const char* g_interface_query();    
+template<typename>
+inline const char* g_interface_query();
 
 #define REGISTER_GLOBAL_INTERFACE(N)\
 struct Interface_##N                 \
@@ -57,7 +58,7 @@ struct Interface_##N                 \
 inline static const char* name = #N;  \
 };                                  \
 template<>                          \
-const char* g_interface_query<N>()  {return Interface_##N::name;}
+inline const char* g_interface_query<N>()  {return Interface_##N::name;}
 
 
 
@@ -84,11 +85,14 @@ struct InterfaceDefinedID<N>: std::true_type{};
 
 
 
+
+
+
 template<typename TO, typename FROM>
 TO* qi(FROM* to)
 {
     static_assert(std::is_base_of_v<Interface, FROM> && std::is_base_of_v<Interface, TO>);
-    return reinterpret_cast<TO*>(to->cast(iid<TO>));
+    return reinterpret_cast<TO*>(to->cast(iid<TypeHelpers::TypeParsed<TO>>));
 };
 
 REGISTER_SYS_INTERFACE(Interface);

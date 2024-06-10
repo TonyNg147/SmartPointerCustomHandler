@@ -11,6 +11,7 @@ private slots:
     void testMakeShared();
     void testReset();
     void testDownCasting();
+    void testAllocationForObject();
 };
 
 class DemoController: public Interface
@@ -30,12 +31,13 @@ public:
 class DemoObject: public AppendCountableHelper<DemoObject, DemoController>
 {
 public:
-    DemoObject(bool* destructorFlag)
+    DemoObject(bool* destructorFlag = nullptr)
     {
         m_destructorFlag = destructorFlag;
     }
     virtual ~DemoObject()
     {
+        if (m_destructorFlag)
         *m_destructorFlag = true;
     }
 
@@ -120,6 +122,24 @@ void TestSharedPtr::testDownCasting()
         QVERIFY2(getDemoController != nullptr, "Have to down cast succes");
     };
     QCOMPARE(isDestructorCalled, true);
+}
+
+void TestSharedPtr::testAllocationForObject()
+{
+    bool isWarningStackAllocation = false;
+    try
+    {
+        DemoObject object;
+    }
+    catch(const std::runtime_error& err)
+    {
+        isWarningStackAllocation = true;
+    }
+    catch(...)
+    {
+        qCritical() << "Undefined exception";
+    }
+    QCOMPARE(isWarningStackAllocation, true);
 }
 
 QTEST_MAIN(TestSharedPtr)

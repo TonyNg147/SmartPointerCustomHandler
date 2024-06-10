@@ -1,8 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <iostream>
-template<typename F, typename T>
-concept IsTypeCompatible = std::is_same_v<F,T> || std::derived_from<T,F>;
+#include "TypesValidation.h"
 
 /**
     The Normal shared pointer attaches the handler for counting and managing 
@@ -35,7 +34,7 @@ class SharedPtr
             }
         }
 
-        template<typename Derived,typename Parent = T> requires IsTypeCompatible<Parent,Derived>
+        template<typename Derived,typename Parent = T> requires TypeContraint::IsTypeCompatible<Parent,Derived>
         SharedPtr(const SharedPtr<Derived>& o)
         {
             m_obj = o.get();
@@ -73,6 +72,11 @@ class SharedPtr
             return m_obj;
         }
 
+        operator bool() const
+        {
+            return m_obj != nullptr;
+        }
+
         void reset()
         {
             if (m_obj)
@@ -98,7 +102,6 @@ class SharedPtr
     private:
 
         T* m_obj = nullptr;
-
 };
 
 template<typename T, typename... Args>

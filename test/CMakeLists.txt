@@ -9,15 +9,14 @@ project(TestPtr)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Test Widgets)
 
-qt_add_executable(${PROJECT_NAME}
-    TestSharedPtr.cpp
+include(BuildScript/WrapTestBuilt.cmake)
+
+WrapBuilt(
+    BuiltName TestSharedPtr
+    Sources TestSharedPtr.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        SmartPtr
-        Qt6::Core
-        Qt6::Gui
-        Qt6::Test
-        Qt6::Widgets
+WrapBuilt(
+    BuiltName TestWeakPtr
+    Sources TestWeakPtr.cpp
 )

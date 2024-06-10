@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(SmartPtr)
 
-set(SOURCES SharedPtr.cpp)
+set(SOURCES SharedPtr.cpp Observable.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 

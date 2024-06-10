@@ -30,7 +30,6 @@ public:
 
     void unref() override
     {
-        std::cout << "Call unref in Countable Object " << m_count << "\n";
         // Need to upper cast to the Original Type to call the upmost destructor first
         // then fails down to the inheritance chain
         // Otherwise, It ingores the Original Type and starts from the CountableObj
